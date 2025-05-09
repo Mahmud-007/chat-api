@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
 import { signupSchema } from '../validations/auth.validation';
-import { hashPassword } from '../utils/hash';
+import { comparePassword, hashPassword } from '../utils/hash';
 import jwt from 'jsonwebtoken';
 import { sendEmailVerification } from '../utils/sendEmail';
 
@@ -51,4 +51,24 @@ export const verifyEmail = async (req: Request, res: Response): Promise<Response
   } catch (err) {
     return res.status(400).json({ error: 'Invalid or expired token' });
   }
+};
+
+
+export const login = async (req: Request, res: Response) => {
+    console.log('Login request received:', req.body); // Debugging line
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+
+  const isMatch = await comparePassword(password, user.password);
+  if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
+
+  if (!user.isVerified) return res.status(403).json({ error: 'Please verify your email' });
+
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
+    expiresIn: '7d',
+  });
+
+  res.status(200).json({ message: 'Login successful', token });
 };
