@@ -4,6 +4,7 @@ import { signupSchema } from '../validations/auth.validation';
 import { comparePassword, hashPassword } from '../utils/hash';
 import jwt from 'jsonwebtoken';
 import { sendEmailVerification } from '../utils/sendEmail';
+import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 
 // Signup function (named export)
 export const signup = async (req: Request, res: Response): Promise<Response> => {  // Explicit return type
@@ -72,3 +73,9 @@ export const login = async (req: Request, res: Response) => {
 
   res.status(200).json({ message: 'Login successful', token });
 };
+
+export const getCurrentUser = async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+  
+    return res.status(200).json({ user: req.user });
+  };
