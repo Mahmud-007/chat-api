@@ -28,8 +28,8 @@ export const signup = async (req: Request, res: Response): Promise<Response> => 
     password: hashedPassword,
   });
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
-    expiresIn: '1d',
+  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET as string, {
+    expiresIn: '7d',
   });
 
   await sendEmailVerification(user.email, token);
@@ -69,7 +69,7 @@ export const login = async (req: Request, res: Response) => {
 
   if (!user.isVerified) return res.status(403).json({ error: 'Please verify your email' });
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
+  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET as string, {
     expiresIn: '7d',
   });
 
