@@ -7,6 +7,7 @@ import morgan from 'morgan';
 import logger from './utils/logger';
 import authRoutes from './routes/auth.routes';
 import protectedRoutes from './routes/protected.routes';
+import adminRoutes from './routes/admin.routes';
 
 dotenv.config();
 connectDB();
@@ -31,7 +32,7 @@ app.get('/', (_, res) => {
 });
 app.use('/api/auth', authRoutes);
 app.use('/api/protected', protectedRoutes);
-
+app.use('/api/admin', adminRoutes);
 // 404 handler
 app.use(notFound);
 
